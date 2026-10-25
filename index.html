@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>High Inquisitor's Console — Werewolf Town</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #09080E;
+      --card-bg: #151221;
+      --card-border: #2A243F;
+      --gold: #F59E0B;
+      --crimson: #EF4444;
+      --emerald: #10B981;
+      --purple: #8B5CF6;
+      --text: #F1F5F9;
+      --text-muted: #94A3B8;
+      --input-bg: #1F1A30;
+      --input-border: #3A3258;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: linear-gradient(180deg, #1A132B 0%, #0D0A17 100%);
+      border-bottom: 1px solid #362955;
+      padding: 1.25rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .brand h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 1.5rem;
+      color: var(--gold);
+      letter-spacing: 0.05em;
+      text-shadow: 0 0 16px rgba(245, 158, 11, 0.4);
+    }
+    .badge {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid var(--crimson);
+      color: #FCA5A5;
+      padding: 0.25rem 0.6rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .auth-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .input-field {
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      color: var(--text);
+      padding: 0.5rem 0.85rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .input-field:focus { border-color: var(--gold); }
+    .btn {
+      background: var(--gold);
+      color: #000;
+      font-weight: 600;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+      font-size: 0.875rem;
+    }
+    .btn:hover { background: #FBBF24; transform: translateY(-1px); }
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid var(--crimson);
+      color: #FCA5A5;
+    }
+    .btn-danger:hover { background: var(--crimson); color: #fff; }
+    .btn-secondary {
+      background: #251E3A;
+      color: var(--text);
+      border: 1px solid var(--card-border);
+    }
+    .btn-secondary:hover { background: #32284D; }
+
+    /* Stat Cards */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      padding: 1.5rem 2rem 0;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 1rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+    .stat-value {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-top: 0.35rem;
+      font-family: 'Cinzel', serif;
+      color: var(--gold);
+    }
+
+    /* Tabs */
+    .tabs-nav {
+      display: flex;
+      gap: 0.5rem;
+      padding: 1.5rem 2rem 0;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 0.75rem 1.25rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      color: var(--gold);
+      border-bottom-color: var(--gold);
+    }
+
+    /* Content Area */
+    main {
+      padding: 1.5rem 2rem 3rem;
+      flex: 1;
+    }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .card-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.25rem;
+      color: var(--gold);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Form grid */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .form-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #CBD5E1;
+    }
+    .form-hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+
+    /* Tables */
+    .table-container {
+      overflow-x: auto;
+      margin-top: 1rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    th {
+      background: #1B162B;
+      padding: 0.75rem 1rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--card-border);
+    }
+    td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid #1D1830;
+      font-size: 0.875rem;
+    }
+    tr:hover td { background: rgba(255, 255, 255, 0.02); }
+    .phase-badge {
+      display: inline-block;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .phase-Lobby { background: #3B82F622; color: #93C5FD; border: 1px solid #3B82F6; }
+    .phase-Night { background: #8B5CF622; color: #C4B5FD; border: 1px solid #8B5CF6; }
+    .phase-Day { background: #F59E0B22; color: #FCD34D; border: 1px solid #F59E0B; }
+    .phase-Lynch { background: #EF444422; color: #FCA5A5; border: 1px solid #EF4444; }
+    .phase-GameEnd { background: #10B98122; color: #6EE7B7; border: 1px solid #10B981; }
+
+    /* Alert Banner */
+    .alert-banner {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid var(--crimson);
+      color: #FCA5A5;
+      padding: 0.85rem 1.25rem;
+      border-radius: 6px;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    #toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: #1E1B2E;
+      border: 1px solid var(--gold);
+      color: var(--text);
+      padding: 0.85rem 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      display: none;
+      z-index: 1000;
+      font-size: 0.875rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span style="font-size: 1.75rem;">⚖️</span>
+      <div>
+        <h1>HIGH INQUISITOR'S CONSOLE</h1>
+        <div style="font-size: 0.75rem; color: var(--text-muted); letter-spacing: 0.05em;">WEREWOLF TOWN LIVE OPERATIONS</div>
+      </div>
+      <span class="badge">RESTRICTED</span>
+    </div>
+    <div class="auth-bar">
+      <select id="serverSelect" class="input-field" onchange="changeServer()" style="background: #1F1A30; color: #F59E0B; font-weight: 600; cursor: pointer;">
+        <option value="https://fangs-torches.onrender.com">Cloud (Render)</option>
+        <option value="http://localhost:4477">Local (:4477)</option>
+      </select>
+      <input type="password" id="adminKeyInput" class="input-field" placeholder="Admin Secret Key" style="width: 200px;" />
+      <button class="btn btn-secondary" onclick="saveAdminKey()">Connect</button>
+      <button class="btn btn-secondary" onclick="loadAllData()">🔄 Refresh</button>
+    </div>
+  </header>
+
+  <div id="maintenanceAlert" class="alert-banner" style="display: none; margin: 1.5rem 2rem 0;">
+    <span>⚠️ <strong>MAINTENANCE MODE IS ACTIVE</strong> — Village creation & quick-join are currently disabled. Existing matches continue until completion.</span>
+    <button class="btn btn-danger" style="padding: 0.25rem 0.75rem; font-size: 0.75rem;" onclick="disableMaintenance()">Disable Maintenance</button>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Active Villages</div>
+      <div class="stat-value" id="statActiveRooms">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Online Sockets</div>
+      <div class="stat-value" id="statOnlineSockets">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Pending Reports</div>
+      <div class="stat-value" id="statPendingReports">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Active Bans</div>
+      <div class="stat-value" id="statActiveBans">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Server Uptime</div>
+      <div class="stat-value" id="statUptime">0m</div>
+    </div>
+  </div>
+
+  <nav class="tabs-nav">
+    <button class="tab-btn active" onclick="switchTab('configTab', this)">⚙️ AppConfig Knobs</button>
+    <button class="tab-btn" onclick="switchTab('roomsTab', this)">🏘️ Active Villages</button>
+    <button class="tab-btn" onclick="switchTab('moderationTab', this)">🛡️ Inquisitor Moderation</button>
+    <button class="tab-btn" onclick="switchTab('telemetryTab', this)">📊 Telemetry & Memory</button>
+  </nav>
+
+  <main>
+    <!-- TAB 1: AppConfig -->
+    <div id="configTab" class="tab-pane active">
+      <div class="card">
+        <h2 class="card-title">⚙️ Operational Business Knobs (AppConfig)</h2>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">
+          Parameters take effect immediately across all active backend nodes and propagate without requiring a server reboot or app store review.
+        </p>
+        <div class="form-grid">
+          <div class="form-group" style="grid-column: 1 / -1;">
+            <div class="toggle-row">
+              <input type="checkbox" id="cfgMaintenance" style="width: 20px; height: 20px; accent-color: var(--crimson);" />
+              <label for="cfgMaintenance" class="form-label" style="font-size: 1rem; color: #FCA5A5; cursor: pointer;">
+                Enable Maintenance Mode (Reject new room creation and quick-join)
+              </label>
+            </div>
+            <div class="form-hint" style="margin-left: 28px;">Active games will finish naturally. Clients will see a gothic maintenance notice.</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="cfgFreeHosts">Free Daily Village Hosts Per Player</label>
+            <input type="number" id="cfgFreeHosts" class="input-field" min="0" max="50" />
+            <div class="form-hint">Unrestricted for players holding active Host Pass.</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="cfgAdCooldown">Interstitial Ad Cooldown (Minutes)</label>
+            <input type="number" id="cfgAdCooldown" class="input-field" min="0" max="60" />
+            <div class="form-hint">Minimum interval between post-match interstitial ad views.</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="cfgMinPlayers">Minimum Players To Start Village</label>
+            <input type="number" id="cfgMinPlayers" class="input-field" min="3" max="15" />
+            <div class="form-hint">Villages dissolve if below this count at join deadline.</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="cfgMaxPlayers">Max Players Allowed Ceiling</label>
+            <input type="number" id="cfgMaxPlayers" class="input-field" min="5" max="30" />
+            <div class="form-hint">Host room capacity selector ceiling.</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="cfgFullCountdown">Full Lobby Grace Countdown (Seconds)</label>
+            <input type="number" id="cfgFullCountdown" class="input-field" min="3" max="60" />
+            <div class="form-hint">Countdown to auto-start once village hits maximum capacity.</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="cfgLobbyIdleTimeout">Lobby Inactivity / Idle Timeout (Minutes)</label>
+            <input type="number" id="cfgLobbyIdleTimeout" class="input-field" min="1" max="60" />
+            <div class="form-hint">Auto-dissolve abandoned lobbies if no joiners/chat activity occurs.</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 1.5rem; display: flex; gap: 1rem; align-items: center;">
+          <button class="btn" onclick="saveConfig()">💾 Save Configuration Knobs</button>
+          <button class="btn btn-secondary" onclick="flushCache()">⚡ Flush In-Memory Cache</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: Active Villages -->
+    <div id="roomsTab" class="tab-pane">
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h2 class="card-title" style="margin-bottom: 0;">🏘️ Live Running Villages</h2>
+          <button class="btn btn-secondary" onclick="loadRooms()">🔄 Refresh Villages</button>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Village Name</th>
+                <th>Phase</th>
+                <th>Day</th>
+                <th>Living / Dead</th>
+                <th>Players</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="roomsTableBody">
+              <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">No active rooms running.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: Moderation -->
+    <div id="moderationTab" class="tab-pane">
+      <div class="card">
+        <h2 class="card-title">🚨 Pending Player Infraction Reports</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Reported Player</th>
+                <th>Reason</th>
+                <th>Details</th>
+                <th>Reporter</th>
+                <th>Time</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="reportsTableBody">
+              <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No pending reports.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">🔨 Issue Manual Global Ban</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label" for="banUid">Target Player UID</label>
+            <input type="text" id="banUid" class="input-field" placeholder="User ID" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="banReason">Ban Reason</label>
+            <input type="text" id="banReason" class="input-field" placeholder="Hate speech, toxicity, cheating..." />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="banDuration">Duration (Hours, 0 for permanent)</label>
+            <input type="number" id="banDuration" class="input-field" value="24" min="0" max="8760" />
+          </div>
+        </div>
+        <div style="margin-top: 1rem;">
+          <button class="btn btn-danger" onclick="submitManualBan()">🚫 Enforce Global Ban & Kick</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">🚫 Active Global Bans</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Player / UID</th>
+                <th>Reason</th>
+                <th>Banned At</th>
+                <th>Type</th>
+                <th>Pardon</th>
+              </tr>
+            </thead>
+            <tbody id="bansTableBody">
+              <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No active bans.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: Telemetry -->
+    <div id="telemetryTab" class="tab-pane">
+      <div class="card">
+        <h2 class="card-title">📊 Server Telemetry & Health</h2>
+        <pre id="telemetryJson" style="background: #0D0A17; border: 1px solid var(--card-border); padding: 1rem; border-radius: 6px; color: #34D399; font-family: monospace; font-size: 0.85rem; overflow-x: auto;">
+Loading telemetry...
+        </pre>
+      </div>
+    </div>
+  </main>
+
+  <div id="toast"></div>
+
+  <script>
+    // Standalone console: the backend lives on a different origin, so the
+    // target server is always explicit. The key is entered by the operator
+    // and kept only in this browser's localStorage.
+    const DEFAULT_BASE_URL = "https://fangs-torches.onrender.com";
+
+    function getAdminKey() {
+      return localStorage.getItem('fangs_admin_key') || '';
+    }
+
+    function getBaseUrl() {
+      const select = document.getElementById('serverSelect');
+      if (select && select.value) return select.value;
+      return localStorage.getItem('fangs_admin_base_url') || DEFAULT_BASE_URL;
+    }
+
+    function changeServer() {
+      const select = document.getElementById('serverSelect');
+      localStorage.setItem('fangs_admin_base_url', select.value);
+      showToast('Connecting to: ' + select.value);
+      loadAllData();
+    }
+
+    function saveAdminKey() {
+      const val = document.getElementById('adminKeyInput').value.trim();
+      if (val) {
+        localStorage.setItem('fangs_admin_key', val);
+        showToast("Admin Key saved.");
+        loadAllData();
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 3000);
+    }
+
+    function switchTab(tabId, el) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+      if (el) {
+        el.classList.add('active');
+      } else {
+        const found = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick')?.includes(tabId));
+        if (found) found.classList.add('active');
+      }
+      const pane = document.getElementById(tabId);
+      if (pane) pane.classList.add('active');
+      if (tabId === 'roomsTab') loadRooms();
+      if (tabId === 'moderationTab') { loadReports(); loadBans(); }
+      if (tabId === 'telemetryTab') loadStats();
+      if (tabId === 'configTab') loadConfig();
+    }
+
+    async function apiFetch(path, options = {}) {
+      const key = getAdminKey();
+      const base = getBaseUrl();
+      const url = base ? base + path : path;
+      const headers = {
+        'Content-Type': 'application/json',
+        'x-admin-key': key,
+        ...(options.headers || {})
+      };
+      const res = await fetch(url, { ...options, headers });
+      if (res.status === 403) {
+        showToast("⚠️ 403 Forbidden: Invalid Admin Key");
+        throw new Error("Forbidden: Invalid Admin Key");
+      }
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error('HTTP ' + res.status + ': ' + text);
+      }
+      return res.json();
+    }
+
+    async function loadStats() {
+      try {
+        const stats = await apiFetch('/admin/stats');
+        document.getElementById('statActiveRooms').textContent = stats.activeRooms ?? 0;
+        document.getElementById('statOnlineSockets').textContent = stats.onlineSockets ?? 0;
+        document.getElementById('statPendingReports').textContent = stats.pendingReportsCount ?? 0;
+        document.getElementById('statActiveBans').textContent = stats.activeBansCount ?? 0;
+
+        const uptimeSec = stats.uptimeSec ?? 0;
+        const hours = Math.floor(uptimeSec / 3600);
+        const mins = Math.floor((uptimeSec % 3600) / 60);
+        document.getElementById('statUptime').textContent = hours > 0 ? (hours + 'h ' + mins + 'm') : (mins + 'm');
+
+        document.getElementById('telemetryJson').textContent = JSON.stringify(stats, null, 2);
+      } catch (e) {
+        console.error("Stats load failed", e);
+      }
+    }
+
+    async function loadConfig() {
+      try {
+        const cfg = await apiFetch('/admin/config');
+        document.getElementById('cfgMaintenance').checked = !!cfg.maintenanceMode;
+        document.getElementById('cfgFreeHosts').value = cfg.freeHostGamesPerDay ?? 3;
+        document.getElementById('cfgAdCooldown').value = cfg.adInterstitialCooldownMinutes ?? 1;
+        document.getElementById('cfgMinPlayers').value = cfg.minPlayersToStart ?? 5;
+        document.getElementById('cfgMaxPlayers').value = cfg.maxPlayersCeiling ?? 20;
+        document.getElementById('cfgFullCountdown').value = cfg.fullLobbyCountdownSec ?? 10;
+        document.getElementById('cfgLobbyIdleTimeout').value = cfg.lobbyIdleTimeoutMinutes ?? 10;
+
+        const alertBanner = document.getElementById('maintenanceAlert');
+        alertBanner.style.display = cfg.maintenanceMode ? 'flex' : 'none';
+      } catch (e) {
+        console.error("Config load failed", e);
+      }
+    }
+
+    async function saveConfig() {
+      try {
+        const body = {
+          maintenanceMode: document.getElementById('cfgMaintenance').checked,
+          freeHostGamesPerDay: parseInt(document.getElementById('cfgFreeHosts').value, 10),
+          adInterstitialCooldownMinutes: parseInt(document.getElementById('cfgAdCooldown').value, 10),
+          minPlayersToStart: parseInt(document.getElementById('cfgMinPlayers').value, 10),
+          maxPlayersCeiling: parseInt(document.getElementById('cfgMaxPlayers').value, 10),
+          fullLobbyCountdownSec: parseInt(document.getElementById('cfgFullCountdown').value, 10),
+          lobbyIdleTimeoutMinutes: parseInt(document.getElementById('cfgLobbyIdleTimeout').value, 10),
+        };
+        await apiFetch('/admin/config', { method: 'PATCH', body: JSON.stringify(body) });
+        showToast("✅ Configuration saved successfully!");
+        loadConfig();
+        loadStats();
+      } catch (e) {
+        showToast("❌ Failed to save configuration.");
+      }
+    }
+
+    async function disableMaintenance() {
+      try {
+        await apiFetch('/admin/config', { method: 'PATCH', body: JSON.stringify({ maintenanceMode: false }) });
+        showToast("✅ Maintenance mode disabled.");
+        loadConfig();
+      } catch (e) {
+        showToast("❌ Failed to disable maintenance.");
+      }
+    }
+
+    async function flushCache() {
+      try {
+        await apiFetch('/admin/cache/flush', { method: 'POST' });
+        showToast("⚡ Cache flushed.");
+        loadConfig();
+      } catch (e) {
+        showToast("❌ Failed to flush cache.");
+      }
+    }
+
+    async function loadRooms() {
+      const tbody = document.getElementById('roomsTableBody');
+      try {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Fetching villages...</td></tr>';
+        const rooms = await apiFetch('/admin/rooms');
+        tbody.innerHTML = '';
+        if (!Array.isArray(rooms) || rooms.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted);">No active rooms running.</td></tr>';
+          return;
+        }
+
+        rooms.forEach(r => {
+          const tr = document.createElement('tr');
+          const membersList = Array.isArray(r.memberNames) && r.memberNames.length > 0
+            ? r.memberNames.join(', ')
+            : 'No connected players';
+          const isEnded = r.phase === 'GameEnd';
+          tr.innerHTML = 
+            '<td><strong style="color: var(--gold); font-family: monospace;">' + (r.code || '') + '</strong></td>' +
+            '<td>' + (r.villageName || 'Village') + (r.isPublic ? ' 🌐' : ' 🔒') + '</td>' +
+            '<td><span class="phase-badge phase-' + (r.phase || 'Lobby') + '">' + (r.phase || 'Lobby') + '</span></td>' +
+            '<td>' + (isEnded ? 'Final' : ('Day ' + (r.dayCount || 0))) + '</td>' +
+            '<td>💚 ' + (r.aliveCount ?? r.playerCount ?? 0) + ' / 💀 ' + (r.deadCount ?? 0) + ' (' + (r.botCount ?? 0) + ' bots)</td>' +
+            '<td style="font-size: 0.75rem; color: var(--text-muted); max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="' + membersList + '">' + membersList + '</td>' +
+            '<td><button class="btn btn-danger" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;" onclick="dissolveRoom(\'' + r.code + '\')">Dissolve</button></td>';
+          tbody.appendChild(tr);
+        });
+      } catch (e) {
+        console.error("Rooms load failed", e);
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--crimson);">Failed to load villages: ' + (e.message || e) + '</td></tr>';
+      }
+    }
+
+    async function dissolveRoom(code) {
+      if (!confirm('Dissolve village ' + code + '? Active players will receive an Inquisitor dissolution notice.')) return;
+      try {
+        await apiFetch('/admin/rooms/' + code, { method: 'DELETE' });
+        showToast('Village ' + code + ' dissolved.');
+        loadRooms();
+        loadStats();
+      } catch (e) {
+        showToast("❌ Failed to dissolve village.");
+      }
+    }
+
+    async function loadReports() {
+      const tbody = document.getElementById('reportsTableBody');
+      try {
+        let reports = await apiFetch('/admin/reports?status=pending');
+        tbody.innerHTML = '';
+        if (!Array.isArray(reports) || reports.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No pending reports.</td></tr>';
+          return;
+        }
+
+        reports.forEach(rep => {
+          const tr = document.createElement('tr');
+          const time = new Date(rep.createdAt).toLocaleString();
+          tr.innerHTML = 
+            '<td><strong>' + (rep.reportedName || '') + '</strong><br><span style="font-size: 0.7rem; color: var(--text-muted);">' + (rep.reportedUid || '') + '</span></td>' +
+            '<td><span class="badge">' + (rep.reason || '') + '</span></td>' +
+            '<td>' + (rep.details || 'No details provided') + '</td>' +
+            '<td>' + (rep.reporterName || '') + '</td>' +
+            '<td style="font-size: 0.75rem; color: var(--text-muted);">' + time + '</td>' +
+            '<td>' +
+              '<div style="display: flex; gap: 0.35rem;">' +
+                '<button class="btn btn-secondary" style="padding: 0.2rem 0.5rem; font-size: 0.7rem;" onclick="actionReport(\'' + rep.id + '\', \'warn\')">Warn</button>' +
+                '<button class="btn btn-danger" style="padding: 0.2rem 0.5rem; font-size: 0.7rem;" onclick="actionReport(\'' + rep.id + '\', \'ban_temp\', 24)">24h Ban</button>' +
+                '<button class="btn btn-danger" style="padding: 0.2rem 0.5rem; font-size: 0.7rem;" onclick="actionReport(\'' + rep.id + '\', \'ban_permanent\')">Perm Ban</button>' +
+                '<button class="btn btn-secondary" style="padding: 0.2rem 0.5rem; font-size: 0.7rem;" onclick="actionReport(\'' + rep.id + '\', \'dismiss\')">Dismiss</button>' +
+              '</div>' +
+            '</td>';
+          tbody.appendChild(tr);
+        });
+      } catch (e) {
+        console.error("Reports load failed", e);
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Failed to load reports: ' + (e.message || e) + '</td></tr>';
+      }
+    }
+
+    async function actionReport(reportId, action, durationHours) {
+      try {
+        await apiFetch('/admin/reports/' + reportId + '/resolve', {
+          method: 'POST',
+          body: JSON.stringify({ action, durationHours, reason: 'Actioned by High Inquisitor (' + action + ')' })
+        });
+        showToast('Report actioned: ' + action);
+        loadReports();
+        loadBans();
+        loadStats();
+      } catch (e) {
+        showToast("❌ Failed to action report.");
+      }
+    }
+
+    async function loadBans() {
+      const tbody = document.getElementById('bansTableBody');
+      try {
+        let bans = await apiFetch('/admin/bans');
+        tbody.innerHTML = '';
+        if (!Array.isArray(bans) || bans.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No active bans.</td></tr>';
+          return;
+        }
+
+        bans.forEach(b => {
+          const tr = document.createElement('tr');
+          const bannedAt = new Date(b.bannedAt).toLocaleString();
+          const typeStr = b.permanent ? '<span class="badge">Permanent</span>' : ('<span>Expires ' + new Date(b.expiresAt).toLocaleString() + '</span>');
+          tr.innerHTML = 
+            '<td><strong>' + (b.displayName || '') + '</strong><br><span style="font-size: 0.7rem; color: var(--text-muted);">' + (b.uid || '') + '</span></td>' +
+            '<td>' + (b.reason || '') + '</td>' +
+            '<td style="font-size: 0.75rem; color: var(--text-muted);">' + bannedAt + '</td>' +
+            '<td>' + typeStr + '</td>' +
+            '<td>' +
+              '<button class="btn btn-secondary" style="padding: 0.2rem 0.5rem; font-size: 0.7rem;" onclick="unbanUser(\'' + b.uid + '\')">Pardon</button>' +
+            '</td>';
+          tbody.appendChild(tr);
+        });
+      } catch (e) {
+        console.error("Bans load failed", e);
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Failed to load bans: ' + (e.message || e) + '</td></tr>';
+      }
+    }
+
+    async function submitManualBan() {
+      const uid = document.getElementById('banUid').value.trim();
+      const reason = document.getElementById('banReason').value.trim();
+      const durationHours = parseInt(document.getElementById('banDuration').value, 10);
+      if (!uid || !reason) {
+        showToast("Please provide UID and reason.");
+        return;
+      }
+
+      try {
+        await apiFetch('/admin/ban', {
+          method: 'POST',
+          body: JSON.stringify({
+            uid,
+            reason,
+            permanent: durationHours === 0,
+            durationHours: durationHours > 0 ? durationHours : undefined,
+          })
+        });
+        showToast('Player ' + uid + ' banned.');
+        document.getElementById('banUid').value = '';
+        document.getElementById('banReason').value = '';
+        loadBans();
+        loadStats();
+      } catch (e) {
+        showToast("❌ Failed to issue ban.");
+      }
+    }
+
+    async function unbanUser(uid) {
+      if (!confirm('Pardon and unban player ' + uid + '?')) return;
+      try {
+        await apiFetch('/admin/ban/' + uid, { method: 'DELETE' });
+        showToast('Player ' + uid + ' pardoned.');
+        loadBans();
+        loadStats();
+      } catch (e) {
+        showToast("❌ Failed to pardon player.");
+      }
+    }
+
+    function loadAllData() {
+      loadStats();
+      loadConfig();
+      loadRooms();
+      loadReports();
+      loadBans();
+    }
+
+    window.onload = () => {
+      document.getElementById('adminKeyInput').value = getAdminKey();
+      const savedBase = localStorage.getItem('fangs_admin_base_url');
+      const select = document.getElementById('serverSelect');
+      if (savedBase && select && Array.from(select.options).some(o => o.value === savedBase)) {
+        select.value = savedBase;
+      }
+      if (!getAdminKey()) {
+        showToast('Enter your admin secret key and press Connect.');
+      } else {
+        loadAllData();
+      }
+      setInterval(() => { if (getAdminKey()) loadStats(); }, 10000);
+      setInterval(() => { if (getAdminKey()) loadRooms(); }, 10000);
+    };
+  </script>
+</body>
+</html>
