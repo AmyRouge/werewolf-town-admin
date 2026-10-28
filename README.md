@@ -1,4 +1,4 @@
-# Werewolf Town — standalone admin console ("High Inquisitor")
+# Wolf Town — standalone admin console ("High Inquisitor")
 
 A single static page (`index.html`, no build). It is the same console the backend
 serves at `/admin`, but hosted separately and talking to the backend API over HTTPS.
